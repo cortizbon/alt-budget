@@ -25,7 +25,7 @@ for idx, sector in enumerate(sectors):
     
 val = sum(dict.values())
 
-st.metrics("Gasto en funcionamiento", val)
+st.metric("Gasto en funcionamiento", val)
 
 st.dataframe(pd.Series(dict).to_frame().rename(columns={0: 'Valor'}))
 
