@@ -12,7 +12,7 @@ df = df[df['Tipo de gasto'] == 'Funcionamiento']
 sectors = list(df['Sector'].unique())
 piv = df.groupby(['Sector'])['Aporte nacional'].sum().sort_values(ascending=False)
 st.dataframe(piv)
-piv[sectors[0]]
+
 
 dict = {}
 
@@ -20,7 +20,8 @@ for idx, sector in enumerate(sectors):
     dict[sector] = st.slider(sector, 
                     min_value=0,
                     max_value=int(piv[sector]), 
-                    key=idx)
+                    key=idx,
+                    value=int(piv[sector]))
     
 val = sum(dict.values())
 
