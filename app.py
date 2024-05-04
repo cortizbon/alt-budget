@@ -13,7 +13,7 @@ sectors = list(df['Sector'].unique())
 entities = list(df['Entidad'].unique())
 cuentas = list(df['Cuenta'].unique())
 piv = df.pivot_table(index=['Sector', 'Entidad', 'Cuenta'],
-                     values='TOTAL',
+                     values='apropiaciones_constantes_2025',
                      aggfunc='sum',
                      columns='Año').fillna(0)
 #piv = df.groupby(['Sector', 'Entidad', 'Cuenta'])['TOTAL'].sum().sort_values(ascending=False)
