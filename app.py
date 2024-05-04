@@ -19,7 +19,6 @@ piv = df.pivot_table(index=['Sector', 'Entidad', 'Cuenta'],
                      aggfunc='sum',
                      columns='Año').fillna(0)
 #piv = df.groupby(['Sector', 'Entidad', 'Cuenta'])['TOTAL'].sum().sort_values(ascending=False)
-st.write(piv)
 col1, col2, col3 = st.columns(3)
 
 list_lines = []
