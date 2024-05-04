@@ -28,7 +28,6 @@ for idx, sector in enumerate(sectors):
     st.header(sector)
     entities = list(df[df['Sector'] == sector]['Entidad'].unique())
     for idx2, entidad in enumerate(entities):
-        st.write(entidad)
         cuentas = list(df[df['Entidad'] == entidad]['Cuenta'].unique())
         with st.expander(entidad):
             for idx3, cuenta in enumerate(cuentas):
