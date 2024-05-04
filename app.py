@@ -69,7 +69,7 @@ val = round(alt_budget['valor'].sum() / 1_000_000_000_000, 2)
 ents_2024 = list(df[df['Año'] == 2024]['Entidad'].unique())
 st.metric("Gasto en funcionamiento", val)
 
-alt_budget = alt_budget[alt_budget['Entidad'].isin(ents_2024)]
+alt_budget = alt_budget[alt_budget['entidad'].isin(ents_2024)]
 st.dataframe(alt_budget)
 
 
