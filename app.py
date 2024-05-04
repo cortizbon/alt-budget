@@ -66,8 +66,10 @@ for idx, sector in enumerate(sectors):
 alt_budget = pd.concat(list_lines)
 val = round(alt_budget['valor'].sum() / 1_000_000_000_000, 2)
 
+ents_2024 = list(df[df['Año'] == 2024]['Entidad'].unique())
 st.metric("Gasto en funcionamiento", val)
 
+alt_budget = alt_budget[alt_budget['Entidad'].isin(ents_2024)]
 st.dataframe(alt_budget)
 
 
