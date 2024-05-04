@@ -5,6 +5,8 @@ st.set_page_config(layout='wide')
 
 st.title("Presupesto alternativo")
 
+st.divider()
+
 
 df = pd.read_csv('desag_1924.csv')
 
@@ -17,8 +19,7 @@ piv = df.pivot_table(index=['Sector', 'Entidad', 'Cuenta'],
                      aggfunc='sum',
                      columns='Año').fillna(0)
 #piv = df.groupby(['Sector', 'Entidad', 'Cuenta'])['TOTAL'].sum().sort_values(ascending=False)
-st.dataframe(piv)
-
+st.write(piv)
 col1, col2, col3 = st.columns(3)
 
 list_lines = []
@@ -63,7 +64,7 @@ for idx, sector in enumerate(sectors):
                 contador += 1
 
             
-alt_budget = pd.concat(list_lines)
+alt_budget = pd.concat(list_lines, ignore_index=True)
 val = round(alt_budget['valor'].sum() / 1_000_000_000_000, 2)
 
 ents_2024 = list(df[df['Año'] == 2024]['Entidad'].unique())
