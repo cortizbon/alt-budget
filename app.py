@@ -10,6 +10,8 @@ st.divider()
 
 df = pd.read_csv('desag_1924.csv')
 
+
+
 df = df[df['Tipo de gasto'] == 'Funcionamiento']
 sectors = list(df['Sector'].unique())
 entities = list(df['Entidad'].unique())
@@ -20,7 +22,7 @@ piv = df.pivot_table(index=['Sector', 'Entidad', 'Cuenta'],
                      columns='Año').fillna(0)
 #piv = df.groupby(['Sector', 'Entidad', 'Cuenta'])['TOTAL'].sum().sort_values(ascending=False)
 col1, col2, col3 = st.columns(3)
-
+st.dataframe(piv)
 list_lines = []
 contador = 0
 
