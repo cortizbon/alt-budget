@@ -51,7 +51,7 @@ for idx, sector in enumerate(sectors):
                                                     min_value=int(piv[2019][sector][entidad][cuenta]),
                                                     max_value=int(piv[2024][sector][entidad][cuenta]), 
                                                     key=contador,
-                                                    value=int(piv[2024][sector][entidad][cuenta]))
+                                                    value=int(piv[2019][sector][entidad][cuenta]))
 
                         #except:
                         #    valor = st.slider(f"{sector[:1]}-{entidad[:1]}-{cuenta}", min_value=0)
