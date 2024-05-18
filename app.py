@@ -122,6 +122,9 @@ with tab2:
     if (dic_cols['PGN'] and dic_cols['Sector']) or (dic_cols['PGN'] and dic_cols['Entidad']) or (dic_cols['Entidad'] and dic_cols['Sector']):
         st.error("Demasiada información para mostrar. Evite combinaciones entre sector, pgn y entidad.")
         st.stop()
+    if not dic_cols['Tipo de gasto']:
+        st.error("Debe seleccionar Tipo de gasto")
+        st.stop()
     cols_to_include = pd.Series(dic_cols)
     cols_to_include = cols_to_include[cols_to_include == True].index
     if len(cols_to_include) > 5:
@@ -246,9 +249,7 @@ with tab3:
     if (dic_cols['PGN'] and dic_cols['Sector']) or (dic_cols['PGN'] and dic_cols['Entidad']) or (dic_cols['Entidad'] and dic_cols['Sector']):
         st.error("Demasiada información para mostrar. Evite combinaciones entre sector, pgn y entidad.")
         st.stop()
-    if not dic_cols['Tipo de gasto']:
-        st.error("Debe seleccionar Tipo de gasto")
-        st.stop()
+    
     cols_to_include = pd.Series(dic_cols)
     cols_to_include = cols_to_include[cols_to_include == True].index
     if len(cols_to_include) > 5:
