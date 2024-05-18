@@ -4,6 +4,7 @@ from utils import create_dataframe_sankey, create_dataframe_sankey2
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from itertools import chain
+import numpy as np
 
 st.set_page_config(layout='wide')
 COLORS_LINKS = dict(enumerate(["#D9D9ED", "#FFE9C5", "#CBECEF"]))
