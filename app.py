@@ -153,7 +153,7 @@ with tab2:
                         .rename(columns={cols_to_include[idx]:'source',
                                          cols_to_include[idx + 1]: 'target',
                                          'Apropiación en precios constantes (2025)':'value'})
-                        ).assign(color=COLORS_LINKS[idx]))
+                        ).assign(value= lambda x: x[value] / 1_000_000_000).assign(color=COLORS_LINKS[idx]))
                 
     
         
@@ -203,7 +203,7 @@ with tab2:
         'hacia %{target.label}:<br /> <b>%{value:.2f}<extra></extra>'
         ))])
 
-        fig.update_layout(title_text="Flujo de gasto", 
+        fig.update_layout(title_text="Flujo de gasto - cifras en miles de millones de pesos", 
                           font_size=10, 
                           width=1000, 
                           height=600)
@@ -263,7 +263,7 @@ with tab3:
         pos1 = []
         for idx, col in enumerate(cols):
             with col:
-                vals = st.multiselect(f"Seleccione para la columna: {cols_to_include[idx]}",
+                vals = st.multiselect(f" Seleccione para la columna: {cols_to_include[idx]}",
                                 df3[cols_to_include[idx]].unique())
                 
                 filters[cols_to_include[idx]] = vals
