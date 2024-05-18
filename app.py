@@ -153,7 +153,7 @@ with tab2:
                         .rename(columns={cols_to_include[idx]:'source',
                                          cols_to_include[idx + 1]: 'target',
                                          'Apropiación en precios constantes (2025)':'value'})
-                        ).assign(value= lambda x: x[value] / 1_000_000_000).assign(color=COLORS_LINKS[idx]))
+                        ).assign(value= lambda x: x['value'] / 1_000_000_000).assign(color=COLORS_LINKS[idx]))
                 
     
         
