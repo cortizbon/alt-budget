@@ -85,132 +85,7 @@ with tab1:
     alt_budget = alt_budget[alt_budget['entidad'].isin(ents_2024)]
     st.dataframe(alt_budget)
 
-with tab2:
-    df2 = pd.read_csv('dataset_192425.csv')
-    year = st.selectbox("Seleccione el año", df2['Año'].unique())
-    df2 = df2[df2['Año'].isin([year])]
-    df2['PGN'] = 'PGN'
-    st.write("Seleccione el nivel de profundidad a analizar: ")
-    col1, col2, col3, col4 = st.columns(4)
-    col5, col6, col7 = st.columns(3)
-    
-    with col1:
-        pgn = st.checkbox("PGN")
-        cuenta = st.checkbox("Cuenta")
-        
-    with col2:
-        sector = st.checkbox("Sector")
-        subcuenta = st.checkbox("Subcuenta")
-        
-    with col3:
-        entidad = st.checkbox("Entidad")
-        objeto = st.checkbox("Objeto")
-        
-    with col4:
-        tipo_gasto = st.checkbox("Tipo de gasto")
-        ordinal = st.checkbox("Ordinal") 
-        
-         
-    dic_cols = {'PGN': pgn, 
-                'Sector': sector,
-                'Entidad': entidad,
-                'Tipo de gasto': tipo_gasto,
-                'Cuenta': cuenta,
-                'Subcuenta': subcuenta,
-                'Objeto/proyecto': objeto, 
-                'Subproyecto': ordinal}
-    if (dic_cols['PGN'] and dic_cols['Sector']) or (dic_cols['PGN'] and dic_cols['Entidad']) or (dic_cols['Entidad'] and dic_cols['Sector']):
-        st.error("Demasiada información para mostrar. Evite combinaciones entre sector, pgn y entidad.")
-        st.stop()
-    if not dic_cols['Tipo de gasto']:
-        st.error("Debe seleccionar Tipo de gasto")
-        st.stop()
-    cols_to_include = pd.Series(dic_cols)
-    cols_to_include = cols_to_include[cols_to_include == True].index
-    if len(cols_to_include) > 5:
-        st.warning("El número de columnas no puede ser mayor a 5.")
-        st.stop()
-    if len(cols_to_include) >= 2: 
-        cols = st.columns(len(cols_to_include))
-        filters = {}
-        df3 = df2.copy()
-        dfs = []
-        nodes = []
-        pos = []
-        for idx, col in enumerate(cols):
-            with col:
-                vals = st.multiselect(f"Seleccione para la columna: {cols_to_include[idx]}",
-                                df3[cols_to_include[idx]].unique())
-                
-                filters[cols_to_include[idx]] = vals
-                for value in df3[cols_to_include[idx]].unique():
-                    nodes.append(value)
-                    pos.append(idx)
-                df3 = df3[df3[cols_to_include[idx]].isin(vals)]
-                if idx != len(cols_to_include) - 1:
-                    dfs.append((df3
-                        .groupby([cols_to_include[idx], 
-                                cols_to_include[idx + 1]])['Apropiación en precios constantes (2025)']
-                        .sum()
-                        .reset_index()
-                        .rename(columns={cols_to_include[idx]:'source',
-                                         cols_to_include[idx + 1]: 'target',
-                                         'Apropiación en precios constantes (2025)':'value'})
-                        ).assign(value= lambda x: x['value'] / 1_000_000_000).assign(color=COLORS_LINKS[idx]))
-                
-    
-        
 
-        prov = dfs[-1]
-        dfs[-1] = prov[prov['target'].isin(vals)]
-        pr = pd.concat(dfs, ignore_index=True)
-
-        l1 = list(pr['source'].unique())
-        l2 = list(pr['target'].unique())
-        lt = list(set(l1 + l2))
-
-        nodes = (pd.DataFrame({'names': nodes,
-                              'pos': pos})
-                              .query("names in @lt")
-                              .reset_index(drop=True)
-                              .reset_index()
-                              .rename(columns={'index':'id'}))
-        dic_lts = dict(nodes[[ 'names', 'id']].values)
-
-
-        nodes['x_pos'] = (nodes['pos'] - nodes['pos'].min()) / (nodes['pos'].max() - nodes['pos'].min()) + 0.02
-        nodes['x_pos'] = [0.96 if v >=1 else v for v in nodes['x_pos']]
-        nodes['color'] = nodes['pos'].map(COLORS_NODES)
-       
-        pr['source'] = pr['source'].map(dic_lts)
-        pr['target'] = pr['target'].map(dic_lts)
-
-        
-        fig = go.Figure(data=[go.Sankey(
-        arrangement='snap',
-        node = dict(
-            pad = 15,
-            thickness = 20,
-            line = dict(color = "#2635bf", width = 0.5),
-            label = nodes['names'],
-            color = nodes['color'],
-            x = nodes['x_pos'].values ,
-            y = nodes['x_pos'].values / 2.4
-        ),
-        link = dict(
-            source = pr['source'], 
-            target = pr['target'],
-            value = pr['value'],
-            color = pr['color'],
-            hovertemplate='Volumen del gasto de %{source.label}<br />'+
-        'hacia %{target.label}:<br /> <b>%{value:.2f}<extra></extra>'
-        ))])
-
-        fig.update_layout(title_text="Flujo de gasto - cifras en miles de millones de pesos", 
-                          font_size=10, 
-                          width=1000, 
-                          height=600)
-        st.plotly_chart(fig)
     
 with tab3:
     data = pd.read_csv('dataset_192425.csv')
@@ -350,7 +225,132 @@ with tab3:
         st.plotly_chart(fig)    
     
     
+with tab2:
+    df2 = pd.read_csv('dataset_192425.csv')
+    year = st.selectbox("Seleccione el año", df2['Año'].unique())
+    df2 = df2[df2['Año'].isin([year])]
+    df2['PGN'] = 'PGN'
+    st.write("Seleccione el nivel de profundidad a analizar: ")
+    col1, col2, col3, col4 = st.columns(4)
+    col5, col6, col7 = st.columns(3)
+    
+    with col1:
+        pgn = st.checkbox("PGN")
+        cuenta = st.checkbox("Cuenta")
+        
+    with col2:
+        sector = st.checkbox("Sector")
+        subcuenta = st.checkbox("Subcuenta")
+        
+    with col3:
+        entidad = st.checkbox("Entidad")
+        objeto = st.checkbox("Objeto")
+        
+    with col4:
+        tipo_gasto = st.checkbox("Tipo de gasto")
+        ordinal = st.checkbox("Ordinal") 
+        
+         
+    dic_cols = {'PGN': pgn, 
+                'Sector': sector,
+                'Entidad': entidad,
+                'Tipo de gasto': tipo_gasto,
+                'Cuenta': cuenta,
+                'Subcuenta': subcuenta,
+                'Objeto/proyecto': objeto, 
+                'Subproyecto': ordinal}
+    if (dic_cols['PGN'] and dic_cols['Sector']) or (dic_cols['PGN'] and dic_cols['Entidad']) or (dic_cols['Entidad'] and dic_cols['Sector']):
+        st.error("Demasiada información para mostrar. Evite combinaciones entre sector, pgn y entidad.")
+        st.stop()
+    if not dic_cols['Tipo de gasto']:
+        st.error("Debe seleccionar Tipo de gasto")
+        st.stop()
+    cols_to_include = pd.Series(dic_cols)
+    cols_to_include = cols_to_include[cols_to_include == True].index
+    if len(cols_to_include) > 5:
+        st.warning("El número de columnas no puede ser mayor a 5.")
+        st.stop()
+    if len(cols_to_include) >= 2: 
+        cols = st.columns(len(cols_to_include))
+        filters = {}
+        df3 = df2.copy()
+        dfs = []
+        nodes = []
+        pos = []
+        for idx, col in enumerate(cols):
+            with col:
+                vals = st.multiselect(f"Seleccione para la columna: {cols_to_include[idx]}",
+                                df3[cols_to_include[idx]].unique())
+                
+                filters[cols_to_include[idx]] = vals
+                for value in df3[cols_to_include[idx]].unique():
+                    nodes.append(value)
+                    pos.append(idx)
+                df3 = df3[df3[cols_to_include[idx]].isin(vals)]
+                if idx != len(cols_to_include) - 1:
+                    dfs.append((df3
+                        .groupby([cols_to_include[idx], 
+                                cols_to_include[idx + 1]])['Apropiación en precios constantes (2025)']
+                        .sum()
+                        .reset_index()
+                        .rename(columns={cols_to_include[idx]:'source',
+                                         cols_to_include[idx + 1]: 'target',
+                                         'Apropiación en precios constantes (2025)':'value'})
+                        ).assign(value= lambda x: x['value'] / 1_000_000_000).assign(color=COLORS_LINKS[idx]))
+                
+    
+        
 
+        prov = dfs[-1]
+        dfs[-1] = prov[prov['target'].isin(vals)]
+        pr = pd.concat(dfs, ignore_index=True)
+
+        l1 = list(pr['source'].unique())
+        l2 = list(pr['target'].unique())
+        lt = list(set(l1 + l2))
+
+        nodes = (pd.DataFrame({'names': nodes,
+                              'pos': pos})
+                              .query("names in @lt")
+                              .reset_index(drop=True)
+                              .reset_index()
+                              .rename(columns={'index':'id'}))
+        dic_lts = dict(nodes[[ 'names', 'id']].values)
+
+
+        nodes['x_pos'] = (nodes['pos'] - nodes['pos'].min()) / (nodes['pos'].max() - nodes['pos'].min()) + 0.02
+        nodes['x_pos'] = [0.96 if v >=1 else v for v in nodes['x_pos']]
+        nodes['color'] = nodes['pos'].map(COLORS_NODES)
+       
+        pr['source'] = pr['source'].map(dic_lts)
+        pr['target'] = pr['target'].map(dic_lts)
+
+        
+        fig = go.Figure(data=[go.Sankey(
+        arrangement='snap',
+        node = dict(
+            pad = 15,
+            thickness = 20,
+            line = dict(color = "#2635bf", width = 0.5),
+            label = nodes['names'],
+            color = nodes['color'],
+            x = nodes['x_pos'].values ,
+            y = nodes['x_pos'].values / 2.4
+        ),
+        link = dict(
+            source = pr['source'], 
+            target = pr['target'],
+            value = pr['value'],
+            color = pr['color'],
+            hovertemplate='Volumen del gasto de %{source.label}<br />'+
+        'hacia %{target.label}:<br /> <b>%{value:.2f}<extra></extra>'
+        ))])
+
+        fig.update_layout(title_text="Flujo de gasto - cifras en miles de millones de pesos", 
+                          font_size=10, 
+                          width=1000, 
+                          height=600)
+        st.plotly_chart(fig)
         
 
         
