@@ -315,14 +315,11 @@ with tab3:
         nodes1['x_pos'] = (nodes1['pos'] - nodes1['pos'].min()) / (nodes1['pos'].max() - nodes1['pos'].min()) + 0.02
         nodes1['x_pos'] = [0.96 if v >=1 else v for v in nodes1['x_pos']]
         nodes1['color'] = nodes1['pos'].map(COLORS_NODES)
-
-        st.dataframe(nodes1)
         
        
         pr1['source'] = pr1['source'].map(dic_lts)
         pr1['target'] = pr1['target'].map(dic_lts)
 
-        st.dataframe(pr1)
         
         
         fig = go.Figure(data=[go.Sankey(
