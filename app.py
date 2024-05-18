@@ -255,9 +255,9 @@ with tab3:
         cols = st.columns(len(cols_to_include))
         filters = {}
         df3 = df2[df2['Tipo de gasto'] == 'Funcionamiento'].copy()
-        dfs = []
-        nodes = []
-        pos = []
+        dfs1 = []
+        nodes1 = []
+        pos1 = []
         for idx, col in enumerate(cols):
             with col:
                 vals = st.multiselect(f"Seleccione para la columna: {cols_to_include[idx]}",
@@ -265,12 +265,12 @@ with tab3:
                 
                 filters[cols_to_include[idx]] = vals
                 for value in df3[cols_to_include[idx]].unique():
-                    nodes.append(value)
-                    pos.append(idx)
+                    nodes1.append(value)
+                    pos1.append(idx)
                 df3 = df3[df3[cols_to_include[idx]].isin(vals)]
                 if idx != len(cols_to_include) - 1:
                     try:
-                        dfs.append((df3
+                        dfs1.append((df3
                             .pivot_table(index = [cols_to_include[idx], 
                                     cols_to_include[idx + 1]],
                                     values='Apropiación en precios constantes (2025)',
@@ -278,7 +278,8 @@ with tab3:
                                     columns='Año'
                                     )
                             .reset_index()
-                            .assign(diff=lambda x: x[2024] - x[2019])
+                            .assign(diff=lambda x: (x[2024] - x[2019]) / 1_000_000_000)
+                            .query("diff > 0")
                             .rename(columns={cols_to_include[idx]:'source',
                                             cols_to_include[idx + 1]: 'target',
                                             'diff':'value'})
@@ -290,30 +291,35 @@ with tab3:
 
         
 
-        prov = dfs[-1]
-        dfs[-1] = prov[prov['target'].isin(vals)]
-        pr = pd.concat(dfs, ignore_index=True)
+        prov = dfs1[-1]
+        dfs1[-1] = prov[prov['target'].isin(vals)]
+        pr1 = pd.concat(dfs1, ignore_index=True)
 
-        l1 = list(pr['source'].unique())
-        l2 = list(pr['target'].unique())
+        l1 = list(pr1['source'].unique())
+        l2 = list(pr1['target'].unique())
         lt = list(set(l1 + l2))
         
 
-        nodes = (pd.DataFrame({'names': nodes,
-                              'pos': pos})
+        nodes1 = (pd.DataFrame({'names': nodes1,
+                              'pos': pos1})
                               .query("names in @lt")
                               .reset_index(drop=True)
                               .reset_index()
                               .rename(columns={'index':'id'}))
-        dic_lts = dict(nodes[[ 'names', 'id']].values)
+        
+        dic_lts = dict(nodes1[[ 'names', 'id']].values)
 
-        nodes['x_pos'] = (nodes['pos'] - nodes['pos'].min()) / (nodes['pos'].max() - nodes['pos'].min()) + 0.02
-        nodes['x_pos'] = [0.96 if v >=1 else v for v in nodes['x_pos']]
-        nodes['color'] = nodes['pos'].map(COLORS_NODES)
+        nodes1['x_pos'] = (nodes1['pos'] - nodes1['pos'].min()) / (nodes1['pos'].max() - nodes1['pos'].min()) + 0.02
+        nodes1['x_pos'] = [0.96 if v >=1 else v for v in nodes1['x_pos']]
+        nodes1['color'] = nodes1['pos'].map(COLORS_NODES)
+
+        st.dataframe(nodes1)
         
        
-        pr['source'] = pr['source'].map(dic_lts)
-        pr['target'] = pr['target'].map(dic_lts)
+        pr1['source'] = pr1['source'].map(dic_lts)
+        pr1['target'] = pr1['target'].map(dic_lts)
+
+        st.dataframe(pr1)
         
         
         fig = go.Figure(data=[go.Sankey(
@@ -322,21 +328,21 @@ with tab3:
             pad = 15,
             thickness = 20,
             line = dict(color = "#2635bf", width = 0.5),
-            label = nodes['names'],
-            color = nodes['color'],
-            x = nodes['x_pos'].values ,
-            y = nodes['x_pos'].values / 2.4
+            label = nodes1['names'],
+            color = nodes1['color'],
+            x = nodes1['x_pos'].values ,
+            y = nodes1['x_pos'].values / 2.4
         ),
         link = dict(
-            source = pr['source'], 
-            target = pr['target'],
-            value = pr['value'],
-            color = pr['color'],
+            source = pr1['source'], 
+            target = pr1['target'],
+            value = pr1['value'],
+            #color = pr1['color'],
             hovertemplate='Volumen del gasto de %{source.label}<br />'+
         'hacia %{target.label}:<br /> <b>%{value:.2f}<extra></extra>'
         ))])
 
-        fig.update_layout(title_text="Flujo de gasto", 
+        fig.update_layout(title_text="Flujo de gasto - Cifras en miles de millones de pesos", 
                           font_size=10, 
                           width=1000, 
                           height=600)
