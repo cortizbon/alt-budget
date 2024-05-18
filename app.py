@@ -211,41 +211,27 @@ with tab2:
 with tab3:
     data = pd.read_csv('dataset_192425.csv')
 
-    df2 = (data[data['Tipo de gasto'] == 'Funcionamiento']
-                .pivot_table(index=['Sector',
-                                        'Entidad',
-                                        'Tipo de gasto',
-                                        'Cuenta', 
-                                        'Subcuenta', 
-                                        'Objeto/proyecto', 
-                                        'Subproyecto',
-                                        ],
-                    columns='Año',
-                    values= 'Apropiación en precios constantes (2025)',
-                    aggfunc='sum')
-                .assign(diff=lambda x: x[2024] - x[2019])
-                .reset_index()
-                .sort_values(by='diff', ascending=False).dropna())
+    df2 = data.copy()
     df2['PGN'] = 'PGN'
     st.write("Seleccione el nivel de profundidad a analizar: ")
     col1, col2, col3, col4 = st.columns(4)
     col5, col6, col7 = st.columns(3)
     
     with col1:
-        pgn = st.checkbox("aPGN")
-        cuenta = st.checkbox("aCuenta")
+        pgn = st.checkbox(" PGN")
+        cuenta = st.checkbox(" Cuenta")
         
     with col2:
-        sector = st.checkbox("aSector")
-        subcuenta = st.checkbox("aSubcuenta")
+        sector = st.checkbox(" Sector")
+        subcuenta = st.checkbox(" Subcuenta")
         
     with col3:
-        entidad = st.checkbox("aEntidad")
-        objeto = st.checkbox("aObjeto")
+        entidad = st.checkbox(" Entidad")
+        objeto = st.checkbox(" Objeto")
         
     with col4:
-        tipo_gasto = st.checkbox("aTipo de gasto")
-        ordinal = st.checkbox("aOrdinal") 
+        tipo_gasto = st.checkbox(" Tipo de gasto")
+        ordinal = st.checkbox(" Ordinal") 
         
          
     dic_cols = {'PGN': pgn, 
@@ -267,7 +253,7 @@ with tab3:
     if len(cols_to_include) >= 2: 
         cols = st.columns(len(cols_to_include))
         filters = {}
-        df3 = df2.copy()
+        df3 = df2[df2['Tipo de gasto'] == 'Funcionamiento'].copy()
         dfs = []
         nodes = []
         pos = []
@@ -282,17 +268,25 @@ with tab3:
                     pos.append(idx)
                 df3 = df3[df3[cols_to_include[idx]].isin(vals)]
                 if idx != len(cols_to_include) - 1:
-                    dfs.append((df3
-                        .groupby([cols_to_include[idx], 
-                                cols_to_include[idx + 1]])['diff']
-                        .sum()
-                        .reset_index()
-                        .rename(columns={cols_to_include[idx]:'source',
-                                         cols_to_include[idx + 1]: 'target',
-                                         'diff':'value'})
-                        ).assign(color=COLORS_LINKS[idx]))
+                    try:
+                        dfs.append((df3
+                            .pivot_table(index = [cols_to_include[idx], 
+                                    cols_to_include[idx + 1]],
+                                    values='Apropiación en precios constantes (2025)',
+                                    aggfunc='sum',
+                                    columns='Año'
+                                    )
+                            .reset_index()
+                            .assign(diff=lambda x: x[2024] - x[2019])
+                            .rename(columns={cols_to_include[idx]:'source',
+                                            cols_to_include[idx + 1]: 'target',
+                                            'diff':'value'})
+                            ).assign(color=COLORS_LINKS[idx]))
+                    except:
+                        st.warning("Hacen falta selecciones.")
+                        st.stop()
                 
-    
+
         
 
         prov = dfs[-1]
@@ -302,6 +296,7 @@ with tab3:
         l1 = list(pr['source'].unique())
         l2 = list(pr['target'].unique())
         lt = list(set(l1 + l2))
+        
 
         nodes = (pd.DataFrame({'names': nodes,
                               'pos': pos})
@@ -311,14 +306,14 @@ with tab3:
                               .rename(columns={'index':'id'}))
         dic_lts = dict(nodes[[ 'names', 'id']].values)
 
-
         nodes['x_pos'] = (nodes['pos'] - nodes['pos'].min()) / (nodes['pos'].max() - nodes['pos'].min()) + 0.02
         nodes['x_pos'] = [0.96 if v >=1 else v for v in nodes['x_pos']]
         nodes['color'] = nodes['pos'].map(COLORS_NODES)
+        
        
         pr['source'] = pr['source'].map(dic_lts)
         pr['target'] = pr['target'].map(dic_lts)
-
+        
         
         fig = go.Figure(data=[go.Sankey(
         arrangement='snap',
