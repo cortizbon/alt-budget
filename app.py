@@ -7,8 +7,8 @@ from itertools import chain
 import numpy as np
 
 st.set_page_config(layout='wide')
-COLORS_LINKS = dict(enumerate(["#D9D9ED", "#FFE9C5", "#CBECEF"]))
-COLORS_NODES = dict(enumerate(["#2F399B", "#F7B261", "#0FB7B3", "#81D3CD"]))
+COLORS_LINKS = dict(enumerate(["#D9D9ED", "#FFE9C5", "#CBECEF", "#CBECEF"]))
+COLORS_NODES = dict(enumerate(["#2F399B", "#F7B261", "#0FB7B3", "#81D3CD", "#81D3CD"]))
 
 st.title("Test-alt")
 
@@ -124,8 +124,8 @@ with tab2:
         st.stop()
     cols_to_include = pd.Series(dic_cols)
     cols_to_include = cols_to_include[cols_to_include == True].index
-    if len(cols_to_include) > 4:
-        st.warning("El número de columnas no puede ser mayor a 4.")
+    if len(cols_to_include) > 5:
+        st.warning("El número de columnas no puede ser mayor a 5.")
         st.stop()
     if len(cols_to_include) >= 2: 
         cols = st.columns(len(cols_to_include))
@@ -214,7 +214,7 @@ with tab3:
 
     df2 = data.copy()
     df2['PGN'] = 'PGN'
-    st.write("Seleccione el nivel de profundidad a analizar: ")
+    st.write("Seleccione el nivel de profundidad a analizar (solo funcionamiento): ")
     col1, col2, col3, col4 = st.columns(4)
     col5, col6, col7 = st.columns(3)
     
@@ -246,10 +246,13 @@ with tab3:
     if (dic_cols['PGN'] and dic_cols['Sector']) or (dic_cols['PGN'] and dic_cols['Entidad']) or (dic_cols['Entidad'] and dic_cols['Sector']):
         st.error("Demasiada información para mostrar. Evite combinaciones entre sector, pgn y entidad.")
         st.stop()
+    if not dic_cols['Tipo de gasto']:
+        st.error("Debe seleccionar Tipo de gasto")
+        st.stop()
     cols_to_include = pd.Series(dic_cols)
     cols_to_include = cols_to_include[cols_to_include == True].index
-    if len(cols_to_include) > 4:
-        st.warning("El número de columnas no puede ser mayor a 4.")
+    if len(cols_to_include) > 5:
+        st.warning("El número de columnas no puede ser mayor a 5.")
         st.stop()
     if len(cols_to_include) >= 2: 
         cols = st.columns(len(cols_to_include))
@@ -337,7 +340,7 @@ with tab3:
             source = pr1['source'], 
             target = pr1['target'],
             value = pr1['value'],
-            #color = pr1['color'],
+            color = pr1['color'],
             hovertemplate='Volumen del gasto de %{source.label}<br />'+
         'hacia %{target.label}:<br /> <b>%{value:.2f}<extra></extra>'
         ))])
