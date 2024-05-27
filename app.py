@@ -362,15 +362,15 @@ with tab4:
                 'Subcuenta': ['Cuenta', 'Subcuenta'],
                 'Objeto': ['Cuenta', 'Subcuenta', 'Objeto'],
                 'Ordinal': ['Cuenta', 'Subcuenta', 'Objeto', 'Ordinal']}
-    df = pd.read_csv("data192425.csv")
+    df = pd.read_csv("data192425_hom.csv")
     col1, col2 = st.columns(2)
     with col1:
         y1 = st.selectbox("Seleccione un año a comparar: ", [2019, 2024])
     with col2:
         y2 = st.selectbox("Seleccione contra qué año comparar: ", [2024, 2025])
 
-    df_func = df[df['Tipo de gasto'] == 'Funcionamiento']
-    piv = (df_func.pivot_table(index=dic_deep[sel],
+    #df_func = df[df['Tipo de gasto'] == 'Funcionamiento']
+    piv = (df.pivot_table(index=dic_deep[sel],
                     columns=['Año'],
                     values='TOTAL_const',
                     aggfunc='sum')
