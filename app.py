@@ -378,7 +378,6 @@ with tab4:
                     aggfunc='sum')
                     .assign(diff=lambda x: x[y2] - x[y1])
                     .sort_values(by='diff', ascending=False)
-                    .drop(columns=[i for i in [2019,2024,2025] if i not in [y2, y1]])
                     .reset_index())
     st.dataframe(piv)
 
