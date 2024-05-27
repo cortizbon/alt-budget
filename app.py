@@ -357,11 +357,12 @@ with tab4:
     st.header("Diff 2019 - 2014 (ordenado)")
     st.divider()
     sel = st.selectbox("Seleccione un nivel de desagregación",
-                 ["Cuenta", 'Subcuenta', 'Objeto', 'Ordinal'])
-    dic_deep = {'Cuenta': ['Cuenta'],
-                'Subcuenta': ['Cuenta', 'Subcuenta'],
-                'Objeto': ['Cuenta', 'Subcuenta', 'Objeto'],
-                'Ordinal': ['Cuenta', 'Subcuenta', 'Objeto', 'Ordinal']}
+                 ["Entidad","Cuenta", 'Subcuenta', 'Objeto', 'Ordinal'])
+    dic_deep = {'Entidad':['Entidad'],
+                'Cuenta': ['Entidad','Cuenta'],
+                'Subcuenta': ['Entidad','Cuenta', 'Subcuenta'],
+                'Objeto': ['Entidad','Cuenta', 'Subcuenta', 'Objeto'],
+                'Ordinal': ['Entidad','Cuenta', 'Subcuenta', 'Objeto', 'Ordinal']}
     df = pd.read_csv("data192425_hom.csv")
     col1, col2 = st.columns(2)
     with col1:
