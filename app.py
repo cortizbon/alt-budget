@@ -376,9 +376,12 @@ with tab4:
                     columns=['Año'],
                     values='TOTAL_const',
                     aggfunc='sum')
+                    .div(1_000_000)
+                    .round(0)
                     .assign(diff=lambda x: x[y2] - x[y1])
                     .sort_values(by='diff', ascending=False)
                     .reset_index())
+    st.subheader(f"Diferencia entre {y2} y {y1} - Cifras en millones de pesos")
     st.dataframe(piv)
 
 
