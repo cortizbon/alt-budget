@@ -5,6 +5,7 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from itertools import chain
 import numpy as np
+import plotly.express as px
 
 st.set_page_config(layout='wide')
 COLORS_LINKS = dict(enumerate(["#D9D9ED", "#FFE9C5", "#CBECEF", "#CBECEF", "#CBECEF"]))
@@ -422,7 +423,7 @@ with tab2:
     data['Cuenta_alt'] = data.apply(rename_cuenta, axis=1)
     data['Ord_alt'] = data.apply(rename_ord, axis=1)
 
-    piv = (data#.query("Objeto == 'SISTEMA GENERAL DE PARTICIPACIONES'").
+    piv = (data
     .pivot_table(index=['Cuenta_alt', 'Ord_alt'],
                     columns='Año',
                     values='TOTAL_const',
@@ -433,6 +434,8 @@ with tab2:
                         .sort_values(by='diff_19_24', ascending=False).reset_index())
 
     piv = piv[['Cuenta_alt', 'Ord_alt', 'diff_19_24']]
+    cop = piv.copy()
+    st.dataframe(piv)
 
     labels = piv['Cuenta_alt'].unique().tolist() + piv['Ord_alt'].unique().tolist()
     dic_labels = dict(enumerate(labels))
@@ -464,6 +467,10 @@ with tab2:
     ))])
 
     fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024)", font_size=10)
+
+    pie_chart = cop.groupby('Cuenta_alt')['diff_19_24'].sum().reset_index()
+    fig2 = px.pie(pie_chart, values='diff_19_24', names='Cuenta_alt', color_discrete_sequence=["#2F399B", "#F7B261", "#0FB7B3"])
+    st.plotly_chart(fig2)
     st.plotly_chart(fig)     
 
         
