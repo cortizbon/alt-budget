@@ -388,26 +388,27 @@ with tab3:
 with tab2:
     data = pd.read_csv('data192425_hom.csv')
 
-    def rename_ord(row):
-        entidad = row['Entidad']
-        cuenta = row['Cuenta']
-        subcuenta = row['Subcuenta']
-        objeto = row['Objeto']
-        ordinal = row['Ordinal']
-        l_objetos = ['PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO', 
-                    'PRESTACIONES SOCIALES ASUMIDAS POR EL GOBIERNO',
-                    'PRESTACIONES DE ASISTENCIA SOCIAL',
-                    'SISTEMA GENERAL DE PARTICIPACIONES']
-        l_ordinal = ['ASEGURAMIENTO, RECLAMACIONES Y SERVICIOS INTEGRALES EN SALUD, (LEY 100 DE 1993 y DECRETO 780 DE 2016)',
-                    'APOYO A PROGRAMAS DE DESARROLLO DE LA SALUD LEY 100 DE 1993']
-        if entidad == 'Ministerio de hacienda y crédito público' and ordinal == 'OTRAS TRANSFERENCIAS - DISTRIBUCIÓN PREVIO CONCEPTO DGPPN':
-            return 'FEPC'
-        elif objeto in l_objetos:
-            return objeto
-        elif ordinal in l_ordinal:
-            return 'Salud'
-        else:
-            return 'Otros (objeto)'
+def rename_ord(row):
+    entidad = row['Entidad']
+    cuenta = row['Cuenta']
+    subcuenta = row['Subcuenta']
+    objeto = row['Objeto']
+    ordinal = row['Ordinal']
+    l_objetos = ['PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO', 
+                 'PRESTACIONES SOCIALES ASUMIDAS POR EL GOBIERNO',
+                 'PRESTACIONES DE ASISTENCIA SOCIAL']
+    l_ordinal = ['ASEGURAMIENTO, RECLAMACIONES Y SERVICIOS INTEGRALES EN SALUD, (LEY 100 DE 1993 y DECRETO 780 DE 2016)',
+                 'APOYO A PROGRAMAS DE DESARROLLO DE LA SALUD LEY 100 DE 1993']
+    if entidad == 'Ministerio de hacienda y crédito público' and ordinal == 'OTRAS TRANSFERENCIAS - DISTRIBUCIÓN PREVIO CONCEPTO DGPPN':
+        return 'FEPC'
+    elif objeto in l_objetos:
+        return "PRESTACIONES SOCIALES"
+    elif objeto == 'SISTEMA GENERAL DE PARTICIPACIONES':
+        return 'SISTEMA GENERAL DE PARTICIPACIONES'
+    elif ordinal in l_ordinal:
+        return 'Salud'
+    else:
+        return 'Otros (objeto)'
 
     def rename_cuenta(row):
         cuenta = row['Cuenta']
