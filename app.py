@@ -466,11 +466,46 @@ with tab2:
         color = "#D9D9ED"
     ))])
 
-    fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024)", font_size=10)
+    fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024) - Cifras en miles de millones de pesos", font_size=10)
 
-    pie_chart = cop.groupby('Cuenta_alt')['diff_19_24'].sum().reset_index()
-    fig2 = px.pie(pie_chart, values='diff_19_24', names='Cuenta_alt', color_discrete_sequence=["#2F399B", "#F7B261", "#0FB7B3"])
+    pie_chart = cop.groupby('Cuenta_alt')['diff_19_24'].sum() / 1_000_000_000
+    pie_chart = pie_chart.reset_index() 
+    fig2 = px.pie(pie_chart, 
+                  values='diff_19_24', 
+                  names='Cuenta_alt', 
+                  color_discrete_sequence=["#2F399B", "#F7B261", "#0FB7B3"],
+                  title="Proporción del cambio en el gasto de funcionamiento (cifras en miles de millones de pesos)")
+    
+    tabla = (data.pivot_table(index='Cuenta',
+                 columns='Año',
+                 values='TOTAL_const',
+                 aggfunc='sum')
+                 .assign(diff_19_24=lambda x: x[2024] - x[2019])
+                 .drop(columns=[2019, 2024, 2025]).sort_values(by='diff_19_24') / 1_000_000_000).round(2)
+
+    tabla = tabla.reset_index()
+
+    colors = ["#2F399B"  if val >= 0 else "#F7B261" for val in tabla['diff_19_24']]
+
+    # Create the horizontal bar chart
+    fig3 = go.Figure(go.Bar(
+        x=tabla['diff_19_24'],
+        y=tabla['Cuenta'],
+        orientation='h',
+        marker=dict(color=colors)
+    ))
+
+    # Update layout for better appearance
+    fig3.update_layout(
+        title='Horizontal Bar Chart',
+        xaxis=dict(title='diff_19_24'),
+        yaxis=dict(title='Cuenta')
+    )
+
+    # Show the plot
+    fig.show()
     st.plotly_chart(fig2)
+    st.plotly_chart(fig3)
     st.plotly_chart(fig)     
 
         
