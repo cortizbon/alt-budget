@@ -467,7 +467,7 @@ with tab2:
         color = "#D9D9ED"
     ))])
 
-    fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024) - Cifras en miles de millones de pesos", font_size=10)
+    fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024)<br>Cifras en miles de millones de pesos", font_size=10)
 
     pie_chart = cop.groupby('Cuenta_alt')['diff_19_24'].sum() / 1_000_000_000
     pie_chart = pie_chart.reset_index() 
@@ -475,7 +475,7 @@ with tab2:
                   values='diff_19_24', 
                   names='Cuenta_alt', 
                   color_discrete_sequence=["#2F399B", "#F7B261", "#0FB7B3"],
-                  title="Proporción del cambio en el gasto de funcionamiento (cifras en miles de millones de pesos)")
+                  title="Proporción del cambio en el gasto de funcionamiento<br>(cifras en miles de millones de pesos)")
     
     tabla = (data.pivot_table(index='Cuenta',
                  columns='Año',
@@ -498,7 +498,7 @@ with tab2:
 
     # Update layout for better appearance
     fig3.update_layout(
-        title='Cambio del gasto en funcionamiento (2019 - 2024) - cifras en miles de millones de pesos',
+        title='Cambio del gasto en funcionamiento (2019 - 2024)<br>cifras en miles de millones de pesos',
         xaxis=dict(title='Cambio del gasto en funcionamiento (2019 - 2024)'),
         yaxis=dict(title='Cuenta')
     )
