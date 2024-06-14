@@ -385,7 +385,85 @@ with tab2:
 #     st.dataframe(piv)
 
 
-        
+with tab3:
+    data = pd.read_csv('data192425_hom.csv')
+
+    def rename_ord(row):
+        entidad = row['Entidad']
+        cuenta = row['Cuenta']
+        subcuenta = row['Subcuenta']
+        objeto = row['Objeto']
+        ordinal = row['Ordinal']
+        l_objetos = ['PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO', 
+                    'PRESTACIONES SOCIALES ASUMIDAS POR EL GOBIERNO',
+                    'PRESTACIONES DE ASISTENCIA SOCIAL',
+                    'SISTEMA GENERAL DE PARTICIPACIONES']
+        l_ordinal = ['ASEGURAMIENTO, RECLAMACIONES Y SERVICIOS INTEGRALES EN SALUD, (LEY 100 DE 1993 y DECRETO 780 DE 2016)',
+                    'APOYO A PROGRAMAS DE DESARROLLO DE LA SALUD LEY 100 DE 1993']
+        if entidad == 'Ministerio de hacienda y crédito público' and ordinal == 'OTRAS TRANSFERENCIAS - DISTRIBUCIÓN PREVIO CONCEPTO DGPPN':
+            return 'FEPC'
+        elif objeto in l_objetos:
+            return objeto
+        elif ordinal in l_ordinal:
+            return 'Salud'
+        else:
+            return 'Otros (objeto)'
+
+    def rename_cuenta(row):
+        cuenta = row['Cuenta']
+
+        if cuenta == 'TRANSFERENCIAS CORRIENTES':
+            return 'TRANSFERENCIAS CORRIENTES'
+        elif cuenta == 'GASTOS DE PERSONAL':
+            return 'GASTOS DE PERSONAL'
+        else:
+            return 'Otros (cuenta)' 
+    data['Cuenta_alt'] = data.apply(rename_cuenta, axis=1)
+    data['Ord_alt'] = data.apply(rename_ord, axis=1)
+
+    piv = (data#.query("Objeto == 'SISTEMA GENERAL DE PARTICIPACIONES'").
+    .pivot_table(index=['Cuenta_alt', 'Ord_alt'],
+                    columns='Año',
+                    values='TOTAL_const',
+                    aggfunc='sum')
+                    .assign(diff_19_24=lambda x: x[2024] - x[2019],
+                            diff_19_25=lambda x: x[2025] - x[2019],
+                            diff_24_25=lambda x: x[2025] - x[2024])
+                        .sort_values(by='diff_19_24', ascending=False).reset_index())
+
+    piv = piv[['Cuenta_alt', 'Ord_alt', 'diff_19_24']]
+
+    labels = piv['Cuenta_alt'].unique().tolist() + piv['Ord_alt'].unique().tolist()
+    dic_labels = dict(enumerate(labels))
+    rev_labels = {}
+
+    for key, value in dic_labels.items():
+        rev_labels[value] = key
+
+
+    piv['source'] = piv['Cuenta_alt'].map(rev_labels)
+    piv['target'] = piv['Ord_alt'].map(rev_labels)
+    piv['values'] = (piv['diff_19_24'] / 1_000_000_000).round(2)
+
+    piv = piv.drop(columns=['Cuenta_alt', 'Ord_alt', 'diff_19_24'])
+
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(
+        pad = 15,
+        thickness = 20,
+        line = dict(color = "black", width = 0.5),
+        label = list(rev_labels.keys()),
+        color = ["#2F399B"] * 3 +  ["#F7B261"] * 7
+        ),
+        link = dict(
+        source = piv['source'], # indices correspond to labels, eg A1, A2, A1, B1, ...
+        target = piv['target'],
+        value = piv['values'],
+        color = "#D9D9ED"
+    ))])
+
+    fig.update_layout(title_text="Flujo de gasto - diff (2019 - 2024)", font_size=10)
+    st.plotly_chart(fig)     
 
         
     
