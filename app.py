@@ -13,8 +13,8 @@ COLORS_NODES = dict(enumerate(["#2F399B", "#F7B261", "#0FB7B3", "#81D3CD", "#81D
 st.title("Test-alt")
 
 tab1, tab2, tab3, tab4 = st.tabs(["Alt-budget", 
-                      "Flujo de gasto",
                       "Diff 2019 - 2024",
+                      "Flujo de gasto",
                       "Diff 2019-2024 (ordenada)"])
 
 
@@ -226,7 +226,7 @@ with tab1:
 #         st.plotly_chart(fig)    
     
     
-with tab2:
+with tab3:
     df2 = pd.read_csv('dataset_192425.csv')
     year = st.selectbox("Seleccione el año", df2['Año'].unique())
     df2 = df2[df2['Año'].isin([year])]
@@ -385,7 +385,7 @@ with tab2:
 #     st.dataframe(piv)
 
 
-with tab3:
+with tab2:
     data = pd.read_csv('data192425_hom.csv')
 
     def rename_ord(row):
