@@ -497,8 +497,8 @@ with tab2:
 
     # Update layout for better appearance
     fig3.update_layout(
-        title='Horizontal Bar Chart',
-        xaxis=dict(title='diff_19_24'),
+        title='Cambio del gasto en funcionamiento (2019 - 2024) - cifras en miles de millones de pesos',
+        xaxis=dict(title='Cambio del gasto en funcionamiento (2019 - 2024)'),
         yaxis=dict(title='Cuenta')
     )
 
