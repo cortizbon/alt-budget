@@ -387,7 +387,7 @@ with tab1:
 
 
 with tab2:
-    col1, col2, col3 = st.columns([1,1,3])
+    col1, col2 = st.columns(2)
     data = pd.read_csv('data192425_hom.csv')
 
     def rename_ord(row):
@@ -509,8 +509,8 @@ with tab2:
         st.plotly_chart(fig2)
     with col2:
         st.plotly_chart(fig3)
-    with col3:
-        st.plotly_chart(fig)     
+    
+    st.plotly_chart(fig)     
 
         
     
